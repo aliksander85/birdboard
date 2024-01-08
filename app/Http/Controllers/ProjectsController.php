@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Project;
-use Illuminate\Http\Request;
 
 class ProjectsController extends Controller
 {
@@ -17,9 +16,13 @@ class ProjectsController extends Controller
     public function store()
     {
         // validate
+        $attributes = request()->validate([
+            'title' => 'required',
+            'description' => 'required',
+        ]);
 
         // persist
-        Project::create(request(['title', 'description']));
+        Project::create($attributes);
 
         // redirect
         return redirect('/projects');

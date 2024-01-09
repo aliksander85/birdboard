@@ -8,27 +8,18 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
-class ProjectsTest extends TestCase
+class ManageProjectsTest extends TestCase
 {
     use WithFaker, RefreshDatabase;
 
-    public function test_guests_cannot_create_projects(): void
-    {
-        $attributes = Project::factory()->raw();
-
-        $this->post('/projects', $attributes)->assertRedirect('login');
-    }
-
-    public function test_guests_cannot_view_projects(): void
-    {
-        $this->get('/projects',)->assertRedirect('login');
-    }
-
-    public function test_guests_cannot_view_a_single_project(): void
+    public function test_guests_cannot_manage_projects(): void
     {
         $project = Project::factory()->create();
 
+        $this->get('/projects',)->assertRedirect('login');
+        $this->get('/projects/create',)->assertRedirect('login');
         $this->get($project->path())->assertRedirect('login');
+        $this->post('/projects', $project->toArray())->assertRedirect('login');
     }
 
     /**
@@ -39,6 +30,8 @@ class ProjectsTest extends TestCase
         $this->withExceptionHandling();
 
         $this->actingAs(User::factory()->create());
+
+        $this->get('/projects/create')->assertStatus(200);
 
         $attributes = [
             'title' => $this->faker->title,
@@ -54,10 +47,10 @@ class ProjectsTest extends TestCase
         // file_put_contents('name.html', $content);
 
         // test passed successfully even when there is no GET route
-        $this->get('/projects')->assertSee($attributes['title']);
-
-        // so it should be used with the following assert
-        $this->get('/projects')->assertOk();
+        // so it should be used with the following assertOk
+        $this->get('/projects')
+            ->assertSee($attributes['title'])
+            ->assertOk();
     }
 
     public function test_a_user_can_view_their_project(): void

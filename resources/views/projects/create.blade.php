@@ -2,7 +2,7 @@
     <form method="POST" action="/projects" class="container" style="padding-top: 40px">
         @csrf
 
-        <h1 class="heading is-1">Create a project</h1>
+        <h1 class="text-2xl">Create a project</h1>
 
         <div class="field">
             <label class="label" for="">Title</label>
@@ -22,8 +22,8 @@
 
         <div class="field">
             <div class="control">
-                <button type="submit" class="button is-link">Create Project</button>
-                <a href="/projects">Cancel</a>
+                <button type="submit" class="button is-link bg-cyan-400">Create Project</button>
+                <a href="/projects" class="text-cyan-400">Cancel</a>
             </div>
         </div>
     </form>

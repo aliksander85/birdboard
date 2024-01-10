@@ -5,3 +5,7 @@
 .button {
     @apply bg-cyan-400 shadow rounded-lg text-white dark:text-black py-2 px-5 text-sm;
 }
+
+.card {
+    @apply bg-white dark:bg-gray-800 py-5 rounded shadow basis-full md:basis-1/2 lg:basis-1/3;
+}

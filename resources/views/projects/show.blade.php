@@ -11,12 +11,19 @@
             <section class="mb-6">
                 <h2 class="text-large text-grey font-normal mb-3">Tasks</h2>
                 <div class="flex flex-col gap-2">
-                    @forelse ($project->tasks as $task)
-                        <div class="card">{{ $task->body }}</div>
-                    @empty
-                        There is no tasks yet.
-                    @endforelse
-
+                    @foreach ($project->tasks as $task)
+                        <div class="card px-4">{{ $task->body }}</div>
+                    @endforeach
+                    <div class="card px-4">
+                        <form action="{{ $project->path() . '/tasks' }}" method="POST">
+                            @csrf
+                            <input
+                                placeholder="Add a new tasks..."
+                                class="w-full bg-white dark:bg-gray-800 border-white dark:border-gray-800"
+                                name="body"
+                            />
+                        </form>
+                    </div>
                 </div>
             </section>
 

@@ -11,10 +11,12 @@
             <section class="mb-6">
                 <h2 class="text-large text-grey font-normal mb-3">Tasks</h2>
                 <div class="flex flex-col gap-2">
-                    <div class="card">Lorem ipsum.</div>
-                    <div class="card">Lorem ipsum.</div>
-                    <div class="card">Lorem ipsum.</div>
-                    <div class="card">Lorem ipsum.</div>
+                    @forelse ($project->tasks as $task)
+                        <div class="card">{{ $task->body }}</div>
+                    @empty
+                        There is no tasks yet.
+                    @endforelse
+
                 </div>
             </section>
 

@@ -27,15 +27,14 @@ class ManageProjectsTest extends TestCase
      */
     public function test_a_user_can_create_a_project(): void
     {
-        $this->withExceptionHandling();
-
         $this->signIn();
 
         $this->get('/projects/create')->assertStatus(200);
 
         $attributes = [
             'title' => $this->faker->title,
-            'description' => $this->faker->text,
+            'description' => $this->faker->sentence,
+            'notes' => 'General notes here.',
         ];
 
         $response = $this->post('/projects', $attributes);
@@ -50,16 +49,32 @@ class ManageProjectsTest extends TestCase
 
         // file_put_contents('name.html', $content);
 
-        // test passed successfully even when there is no GET route
-        // so it should be used with the following assertOk
-        $this->get('/projects')
+        $this->get($project->path())
             ->assertSee($attributes['title'])
+            ->assertSee($attributes['description'])
+            ->assertSee($attributes['notes'])
             ->assertOk();
+    }
+
+    public function test_a_user_can_update_a_project(): void
+    {
+        $this->withExceptionHandling();
+
+        $this->signIn();
+
+        $project = Project::factory()->create(['owner_id' => auth()->id()]);
+
+        $this->patch($project->path(), [
+            'notes' => 'Changed'
+        ])
+            ->assertRedirect($project->path());
+
+        $this->assertDatabaseHas('projects', ['notes' => 'Changed']);
     }
 
     public function test_a_user_can_view_their_project(): void
     {
-        // $this->withExceptionHandling();
+        $this->withExceptionHandling();
 
         $this->signIn();
 
@@ -80,6 +95,17 @@ class ManageProjectsTest extends TestCase
         $project = Project::factory()->create();
 
         $this->get($project->path())->assertStatus(403);
+    }
+
+    public function test_an_authenticated_user_cannot_update_the_projects_of_thers(): void
+    {
+        $this->withExceptionHandling();
+
+        $this->signIn();
+
+        $project = Project::factory()->create();
+
+        $this->patch($project->path(), [])->assertStatus(403);
     }
 
     public function test_a_project_requires_a_title(): void

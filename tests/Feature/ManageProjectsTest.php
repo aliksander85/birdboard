@@ -6,6 +6,7 @@ use App\Models\Project;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Facades\Tests\Setup\ProjectFactory;
 use Tests\TestCase;
 
 class ManageProjectsTest extends TestCase
@@ -58,15 +59,11 @@ class ManageProjectsTest extends TestCase
 
     public function test_a_user_can_update_a_project(): void
     {
-        $this->withExceptionHandling();
+        $project = ProjectFactory::create();
 
-        $this->signIn();
-
-        $project = Project::factory()->create(['owner_id' => auth()->id()]);
-
-        $this->patch($project->path(), [
-            'notes' => 'Changed'
-        ])
+        $this
+            ->actingAs($project->owner)
+            ->patch($project->path(), ['notes' => 'Changed'])
             ->assertRedirect($project->path());
 
         $this->assertDatabaseHas('projects', ['notes' => 'Changed']);
@@ -74,19 +71,17 @@ class ManageProjectsTest extends TestCase
 
     public function test_a_user_can_view_their_project(): void
     {
-        $this->withExceptionHandling();
+        $project = ProjectFactory::create();
 
-        $this->signIn();
-
-        $project = Project::factory()->create(['owner_id' => auth()->id()]);
-
-        $this->get($project->path())
+        $this
+            ->actingAs($project->owner)
+            ->get($project->path())
             ->assertSee($project->title)
             ->assertSee($project->description)
             ->assertOk();
     }
 
-    public function test_an_authenticated_user_cannot_view_the_projects_of_thers(): void
+    public function test_an_authenticated_user_cannot_view_the_projects_of_others(): void
     {
         $this->withExceptionHandling();
 
@@ -105,7 +100,7 @@ class ManageProjectsTest extends TestCase
 
         $project = Project::factory()->create();
 
-        $this->patch($project->path(), [])->assertStatus(403);
+        $this->patch($project->path())->assertStatus(403);
     }
 
     public function test_a_project_requires_a_title(): void

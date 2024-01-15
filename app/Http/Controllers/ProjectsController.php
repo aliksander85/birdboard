@@ -6,6 +6,15 @@ use App\Models\Project;
 
 class ProjectsController extends Controller
 {
+    protected function validateRequest()
+    {
+        return request()->validate([
+            'title' => 'required',
+            'description' => 'required',
+            'notes' => 'min:3',
+        ]);
+    }
+
     public function index()
     {
         $projects = auth()->user()->projects;
@@ -27,27 +36,23 @@ class ProjectsController extends Controller
 
     public function store()
     {
-        // validate
-        $attributes = request()->validate([
-            'title' => 'required',
-            'description' => 'required',
-            'notes' => 'min:3',
-        ]);
-
         // persist
-        $project = auth()->user()->projects()->create($attributes);
+        $project = auth()->user()->projects()->create($this->validateRequest());
 
         // redirect
         return redirect($project->path());
+    }
+
+    public function edit(Project $project)
+    {
+        return view('projects.edit', compact('project'));
     }
 
     public function update(Project $project)
     {
         $this->authorize('update', $project);
 
-        $project->update([
-            'notes' => request('notes'),
-        ]);
+        $project->update($this->validateRequest());
 
         return redirect($project->path());
     }

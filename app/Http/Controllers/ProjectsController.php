@@ -56,7 +56,7 @@ class ProjectsController extends Controller
      */
     public function update(UpdateProjectRequest $request, Project $project)
     {
-        $project->update($request->validated());
+        $request->save();
 
         return redirect($project->path());
     }
